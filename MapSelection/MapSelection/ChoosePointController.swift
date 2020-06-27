@@ -15,10 +15,20 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
     
     var mapView : MKMapView!
     var annotations : [MKPointAnnotation] = []
+    var searchController : UISearchController = UISearchController(searchResultsController: nil)
+    var selectedSearchPlacemark : MKPlacemark!
     
     private let regionRadius : CLLocationDistance = 1000
     private var locationManager = CLLocationManager()
     private var info : PointsInfoToPass!
+    
+    private var doneButton : UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitle("Done", for: .normal)
+        btn.setTitleColor(.black, for: .normal)
+        return btn
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,10 +45,20 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
     }
     
     private func setUp() {
+        let locationSearchTable = LocationSearchTable()
+        locationSearchTable.selectLocationDel = self
+        self.searchController = UISearchController(searchResultsController: locationSearchTable)
+        
+        self.searchController.searchResultsUpdater = locationSearchTable
+        let searchBar = self.searchController.searchBar
+        searchBar.sizeToFit()
+        self.navigationItem.titleView = searchBar
+        self.searchController.hidesNavigationBarDuringPresentation = false
+        self.searchController.dimsBackgroundDuringPresentation = true
+        definesPresentationContext = true
         self.view.backgroundColor = .white
-        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.done))]
         self.mapView = MKMapView(frame: CGRect(x: 0, y: 50, width: self.view.frame.width, height: 400))
-        //var manager = CLLocationManager()
+        locationSearchTable.mapView = self.mapView
         self.locationManager.requestWhenInUseAuthorization()
         self.locationManager.requestAlwaysAuthorization()
         if (CLLocationManager.locationServicesEnabled())
@@ -53,6 +73,12 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(gestureRecognizer:)))
         gestureRecognizer.delegate = self
         mapView.addGestureRecognizer(gestureRecognizer)
+        
+        self.view.addSubview(self.doneButton)
+        self.doneButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        self.doneButton.topAnchor.constraint(equalTo: self.mapView.bottomAnchor, constant: 20).isActive = true
+        self.doneButton.isHidden = true
+        self.doneButton.addTarget(self, action: #selector(self.done), for: .touchUpInside)
     }
     
     func centerLocationOnMap(location: CLLocation) {
@@ -67,7 +93,9 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
     }
     
     @objc func handleTap(gestureRecognizer: UILongPressGestureRecognizer) {
-
+        guard self.annotations.count <= 3 else {
+            return
+        }
         let location = gestureRecognizer.location(in: mapView)
         let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
 
@@ -76,10 +104,24 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
         annotation.coordinate = coordinate
         mapView.addAnnotation(annotation)
         self.annotations.append(annotation)
+        
+        if self.annotations.count == 4 {
+            self.doneButton.isHidden = false
+        }
     }
     
     @objc private func done() {
         self.info._selectPointsDel.didSelectPoints(points: self.annotations)
         self.dismiss(animated: true) {}
     }
+}
+
+extension ChoosePointController : SelectLocationDel {
+    func didSelectSearch(placemark: MKPlacemark) {
+        guard placemark.location != nil else { return }
+        self.selectedSearchPlacemark = placemark
+        self.centerLocationOnMap(location: placemark.location!)
+    }
+    
+    
 }

@@ -15,6 +15,8 @@
 		A23E46C424A5372700F6D144 /* MapSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23E46C324A5372700F6D144 /* MapSelectionTests.swift */; };
 		A23E46CF24A5372700F6D144 /* MapSelectionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23E46CE24A5372700F6D144 /* MapSelectionUITests.swift */; };
 		A23E46DD24A5553700F6D144 /* ChoosePointController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23E46DC24A5553700F6D144 /* ChoosePointController.swift */; };
+		A23E46DF24A6933900F6D144 /* LocationSearchTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23E46DE24A6933900F6D144 /* LocationSearchTable.swift */; };
+		A23E46E124A6DDB700F6D144 /* SearchLocationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23E46E024A6DDB700F6D144 /* SearchLocationCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		A23E46CE24A5372700F6D144 /* MapSelectionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSelectionUITests.swift; sourceTree = "<group>"; };
 		A23E46D024A5372700F6D144 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A23E46DC24A5553700F6D144 /* ChoosePointController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoosePointController.swift; sourceTree = "<group>"; };
+		A23E46DE24A6933900F6D144 /* LocationSearchTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchTable.swift; sourceTree = "<group>"; };
+		A23E46E024A6DDB700F6D144 /* SearchLocationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLocationCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +110,8 @@
 				A23E46B724A5372700F6D144 /* LaunchScreen.storyboard */,
 				A23E46BA24A5372700F6D144 /* Info.plist */,
 				A23E46DC24A5553700F6D144 /* ChoosePointController.swift */,
+				A23E46DE24A6933900F6D144 /* LocationSearchTable.swift */,
+				A23E46E024A6DDB700F6D144 /* SearchLocationCell.swift */,
 			);
 			path = MapSelection;
 			sourceTree = "<group>";
@@ -262,6 +268,8 @@
 				A23E46B124A5372100F6D144 /* ViewController.swift in Sources */,
 				A23E46DD24A5553700F6D144 /* ChoosePointController.swift in Sources */,
 				A23E46AD24A5372100F6D144 /* AppDelegate.swift in Sources */,
+				A23E46E124A6DDB700F6D144 /* SearchLocationCell.swift in Sources */,
+				A23E46DF24A6933900F6D144 /* LocationSearchTable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
