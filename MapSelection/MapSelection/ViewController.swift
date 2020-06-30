@@ -23,10 +23,11 @@ struct PointsInfoToPass {
     }
 }
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, MKMapViewDelegate {
     
     private var mapView : MKMapView!
     private let regionRadius : CLLocationDistance = 1000
+    private var pointsSelected : [MKPointAnnotation] = []
     
     private var choosePointButton : UIButton = {
         let btn = UIButton()
@@ -55,8 +56,9 @@ class ViewController: UIViewController {
     
     private func setUp() {
         self.view.backgroundColor = .white
-    
+        
         self.mapView = MKMapView(frame: CGRect(x: 0, y: 50, width: self.view.frame.width, height: 300))
+        self.mapView.delegate = self
         let stack = UIStackView()
         let stackHeight : CGFloat = 500
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -79,10 +81,21 @@ class ViewController: UIViewController {
         mapView.setRegion(coordinateRegion, animated: true)
     }
     
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        
+        if overlay .isKind(of: MKPolygon.self) {
+            let renderer = MKPolygonRenderer(overlay: overlay)
+            renderer.fillColor = UIColor(white: 0.5, alpha: 0.5)
+            return renderer
+        }
+        return MKOverlayRenderer(overlay: overlay)
+    }
+    
     @objc func choosePoint(_ sender: UIButton) {
         let mapVC = ChoosePointController(info: PointsInfoToPass(del: self, points: []))
         let navVC = UINavigationController(rootViewController: mapVC)
         navVC.modalPresentationStyle = .fullScreen
+        self.mapView.removeAnnotations(self.pointsSelected)
         self.present(navVC, animated: true)
     }
 
@@ -91,10 +104,16 @@ class ViewController: UIViewController {
 extension ViewController : SelectPointsDel {
     func didSelectPoints(points: [MKPointAnnotation]) {
         guard !points.isEmpty else { return }
+        self.pointsSelected = points
+        var coordinates = [CLLocationCoordinate2D]()
         for point in points {
             self.mapView.addAnnotation(point)
+            coordinates.append(point.coordinate)
         }
         self.mapView.setRegion(MKCoordinateRegion(center: points[0].coordinate, latitudinalMeters: self.regionRadius, longitudinalMeters: regionRadius), animated: true)
+        let polygon = MKPolygon(coordinates: &coordinates, count: coordinates.count)
+        self.mapView.addOverlay(polygon)
+        
     }
 }
 
