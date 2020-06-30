@@ -16,18 +16,37 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
     var mapView : MKMapView!
     var annotations : [MKPointAnnotation] = []
     var searchController : UISearchController = UISearchController(searchResultsController: nil)
-    var selectedSearchPlacemark : MKPlacemark!
     
     private let regionRadius : CLLocationDistance = 1000
     private var locationManager = CLLocationManager()
     private var info : PointsInfoToPass!
     
-    private var doneButton : UIButton = {
+    private let doneButton : UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("Done", for: .normal)
         btn.setTitleColor(.black, for: .normal)
+        btn.giveBorder(color: .black)
         return btn
+    }()
+    
+    private let resetButton : UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitle("Reset", for: .normal)
+        btn.setTitleColor(.black, for: .normal)
+        btn.giveBorder(color: .black)
+        return btn
+    }()
+    
+    private let descriptionLabel : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "Tap on map to place a pin, you'll need 4 pins to set your location."
+        lbl.font = UIFont.systemFont(ofSize: 20)
+        lbl.textColor = .black
+        lbl.numberOfLines = 0
+        return lbl
     }()
     
     override func viewDidLoad() {
@@ -69,16 +88,31 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
             locationManager.startUpdatingLocation()
         }
         self.centerLocationOnMap(location: locationManager.location!)
-        self.view.addSubview(self.mapView)
+        self.mapView.showsUserLocation = true
+        let stack = UIStackView()
+        let stackHeight : CGFloat = 500
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = 15
+        stack.addArrangedSubview(descriptionLabel)
+        stack.addArrangedSubview(self.mapView)
+        stack.addArrangedSubview(self.resetButton)
+        self.view.addSubview(stack)
+        self.view.addSubview(self.doneButton)
+        stack.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
+        stack.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 10).isActive = true
+        stack.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10).isActive = true
+        stack.heightAnchor.constraint(equalToConstant: stackHeight).isActive = true
+        self.doneButton.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: 10).isActive = true
+        self.doneButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        self.doneButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(gestureRecognizer:)))
         gestureRecognizer.delegate = self
-        mapView.addGestureRecognizer(gestureRecognizer)
-        
-        self.view.addSubview(self.doneButton)
-        self.doneButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-        self.doneButton.topAnchor.constraint(equalTo: self.mapView.bottomAnchor, constant: 20).isActive = true
+        self.mapView.addGestureRecognizer(gestureRecognizer)
+        self.mapView.delegate = self
         self.doneButton.isHidden = true
         self.doneButton.addTarget(self, action: #selector(self.done), for: .touchUpInside)
+        self.resetButton.addTarget(self, action: #selector(self.reset), for: .touchUpInside)
     }
     
     func centerLocationOnMap(location: CLLocation) {
@@ -89,7 +123,15 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         locationManager = manager
         // Only called when variable have location data
-        //authorizelocationstates()
+    }
+    
+    @objc private func reset() {
+        for annotation in self.mapView.annotations {
+            self.mapView.removeAnnotation(annotation)
+        }
+        self.annotations = []
+        self.doneButton.isHidden = true
+        self.centerLocationOnMap(location: locationManager.location!)
     }
     
     @objc func handleTap(gestureRecognizer: UILongPressGestureRecognizer) {
@@ -119,7 +161,6 @@ class ChoosePointController : UIViewController, MKMapViewDelegate, CLLocationMan
 extension ChoosePointController : SelectLocationDel {
     func didSelectSearch(placemark: MKPlacemark) {
         guard placemark.location != nil else { return }
-        self.selectedSearchPlacemark = placemark
         self.centerLocationOnMap(location: placemark.location!)
     }
     

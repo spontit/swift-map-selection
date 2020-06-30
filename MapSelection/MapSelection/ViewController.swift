@@ -33,7 +33,18 @@ class ViewController: UIViewController {
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("Choose Points", for: .normal)
         btn.setTitleColor(.black, for: .normal)
+        btn.giveBorder(color: .black)
         return btn
+    }()
+    
+    private let descriptionLabel : UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "Press the button to set your location."
+        lbl.font = UIFont.systemFont(ofSize: 28)
+        lbl.textColor = .black
+        lbl.numberOfLines = 0
+        return lbl
     }()
 
     override func viewDidLoad() {
@@ -44,11 +55,22 @@ class ViewController: UIViewController {
     
     private func setUp() {
         self.view.backgroundColor = .white
+    
         self.mapView = MKMapView(frame: CGRect(x: 0, y: 50, width: self.view.frame.width, height: 300))
-        self.view.addSubview(mapView)
-        self.view.addSubview(self.choosePointButton)
-        self.choosePointButton.topAnchor.constraint(equalTo: mapView.bottomAnchor, constant: 20).isActive = true
-        self.choosePointButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        let stack = UIStackView()
+        let stackHeight : CGFloat = 500
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.addArrangedSubview(self.descriptionLabel)
+        stack.addArrangedSubview(self.mapView)
+        stack.addArrangedSubview(self.choosePointButton)
+        self.view.addSubview(stack)
+        //stack.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
+        stack.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        stack.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
+        stack.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10).isActive = true
+        stack.heightAnchor.constraint(equalToConstant: stackHeight).isActive = true
         self.choosePointButton.addTarget(self, action: #selector(self.choosePoint(_:)), for: .touchUpInside)
     }
     
@@ -76,3 +98,14 @@ extension ViewController : SelectPointsDel {
     }
 }
 
+extension UIView {
+
+func removeBorder() {
+    self.layer.borderWidth = 0
+}
+
+func giveBorder(color: UIColor) {
+    self.layer.borderWidth = 1
+    self.layer.borderColor = color.cgColor
+}
+}
